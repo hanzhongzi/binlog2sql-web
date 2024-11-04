@@ -37,7 +37,7 @@
 1. 克隆项目
 ```
 git clone https://github.com/你的用户名/Binlog2SQL-Web.git
-cd Binlog2SQL-Web
+cd binlog2sql-web
 ```
 2. 创建虚拟环境并安装依赖
 ```
@@ -64,8 +64,8 @@ python3 manage.py runserver
 在 binlog_form.html 页面中，可以填写以下内容进行解析：
 ```
 主机名：127.0.0.1
-端口：3306
-用户名：root
+端口：3306 
+用户名：root #注意权限问题：这里如果是别的用户需要 GRANT super,replication slave,replicaiton client ON *.* to 你的用户@'这个项目运行的网络段/IP';
 密码：yourpassword
 数据库名：test_db
 表名：test_table
