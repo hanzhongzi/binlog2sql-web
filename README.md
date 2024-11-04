@@ -41,7 +41,7 @@ cd Binlog2SQL-Web
 ```
 2. 创建虚拟环境并安装依赖
 ```
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # 对于 Windows 使用 `venv\Scripts\activate`
 pip install -r requirements.txt
 ```
