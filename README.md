@@ -36,7 +36,7 @@
 ## 安装与运行
 1. 克隆项目
 ```
-git clone https://github.com/你的用户名/Binlog2SQL-Web.git
+git clone https://github.com/hanzhongzi/binlog2sql-web.git
 cd binlog2sql-web
 ```
 2. 创建虚拟环境并安装依赖
