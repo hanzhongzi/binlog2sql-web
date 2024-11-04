@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-**Binlog2SQL Web** 是一个基于 Django 框架的 Web 应用，用于解析 MySQL binlog 日志并生成对应的 SQL 语句。该工具对数据库管理员和开发者在进行数据库备份、恢复和数据回滚方面提供了极大的便利。
+**Binlog2SQL Web** 是一个基于 Django 框架的 Web 应用，用于解析 MySQL binlog 日志并生成对应的 SQL 语句。该工具对数据库管理员和开发者在进行数据库binlog获取、恢复误操作和数据闪回、回滚方面提供了极大的便利。
 
 ## 功能特性
 
