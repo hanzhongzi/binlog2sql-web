@@ -1,0 +1,11 @@
+[mysqldatabase]
+ENGINE = "django.db.backends.mysql"
+NAME = "future"
+USER = "future"
+PASSWORD = "future"
+HOST = "future"
+PORT = "future"
+
+[binlog2sql]
+BINLOG2SQLPATH = "binlog2sql_web/source_code/binlog2sql.py"
+

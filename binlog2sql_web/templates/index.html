@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目说明 - Binlog2SQL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎使用 Binlog2SQL 项目</h1>
+        <p>本项目提供了一个基于网页的 MySQL binlog 转换为 SQL 语句的工具。</p>
+        <p>点击下方按钮进入 Binlog2SQL 表单页面：</p>
+        <ul>
+            <li>MySQL Server需要开启binlog</li>
+            <li>注意使用用户需要有super,replication slave,replicaiton client权限</li>
+            <li>GRANT super,replication slave,replicaiton client ON *.* to 你的用户@'这个项目运行的网络段/IP'; </li>
+        </ul>
+        <a href="/binlog-form/" class="btn">进入 Binlog2SQL 表单</a>
+    </div>
+</body>
+</html>

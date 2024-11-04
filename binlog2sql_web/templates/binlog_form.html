@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binlog2SQL Interface</title>
+    <style>
+        /* 样式区 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto; /* 确保页面可以垂直滚动 */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-height: 90vh;  /* 确保容器不超过视口高度的90% */
+            overflow-y: auto;  /* 容器内部也可以滚动 */
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:disabled {
+            background-color: #c3c3c3;
+            cursor: not-allowed;
+        }
+        .output {
+            margin-top: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: #444;
+            background: #f7f7f7;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+        .loading {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>指定时间的binlog提取或闪回</h2>
+        <form id="binlogForm">
+            <!-- 表单字段 -->
+            <div class="form-group">
+                <label for="host">Host</label>
+                <input type="text" id="host" name="host" required>
+            </div>
+            <div class="form-group">
+                <label for="port">Port</label>
+                <input type="number" id="port" name="port" required>
+            </div>
+            <div class="form-group">
+                <label for="user">User</label>
+                <input type="text" id="user" name="user" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="text" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="database">Database</label>
+                <input type="text" id="database" name="database" required>
+            </div>
+            <div class="form-group">
+                <label for="table">Table</label>
+                <input type="text" id="table" name="table" required>
+            </div>
+            <div class="form-group">
+                <label for="start_file">Start File</label>
+                <input type="text" id="start_file" name="start_file" required>
+            </div>
+            <div class="form-group">
+                <label for="start_datetime">Start Datetime</label>
+                <input type="text" id="start_datetime" name="start_datetime" placeholder="YYYY-MM-DD HH:MM:SS" required>
+            </div>
+            <div class="form-group">
+                <label for="stop_datetime">Stop Datetime</label>
+                <input type="text" id="stop_datetime" name="stop_datetime" placeholder="YYYY-MM-DD HH:MM:SS" required>
+            </div>
+            <div class="form-group">
+                <label>是否要闪回语句?</label>
+                <label><input type="radio" name="flashback" value="true"> Yes</label>
+                <label><input type="radio" name="flashback" value="false" checked> No</label>
+            </div>
+            <button type="button" id="runButton" onclick="submitForm()">Run Binlog2SQL</button>
+            <button type="button" onclick="clearOutput()">Clear Output</button>
+        </form>
+
+        <!-- 输出区 -->
+        <table class="output" id="outputTable"></table>
+        <p id="loadingText" class="loading" style="display: none;">加载中...</p>
+    </div>
+
+    <script>
+    async function submitForm() {
+        const runButton = document.getElementById('runButton');
+        const loadingText = document.getElementById('loadingText');
+        const output = document.getElementById('output');
+
+        // 禁用按钮并显示“加载中...”文本
+        runButton.disabled = true;
+        loadingText.style.display = 'block';
+        output.textContent = '';  // 清空输出区
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 设置超时时间 1分钟
+
+        const formData = new FormData(document.getElementById('binlogForm'));
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+
+        try {
+            const response = await fetch('/run-binlog2sql/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+                signal: controller.signal
+            });
+            
+            const result = await response.json();
+
+            // 取消超时计时器
+            clearTimeout(timeoutId);
+
+            // 恢复按钮状态，隐藏“加载中...”文本，显示返回结果
+            runButton.disabled = false;
+            loadingText.style.display = 'none';
+            output.textContent = result.status === "success" ? result.output : result.error;
+
+        } catch (error) {
+            // 请求出错时处理
+            clearTimeout(timeoutId);
+            runButton.disabled = false;
+            loadingText.style.display = 'none';
+            output.textContent = "An error occurred: " + (error.name === 'AbortError' ? 'Request timed out' : error.message);
+        }
+    }
+
+    // 清空输出
+    function clearOutput() {
+        document.getElementById('output').textContent = '';
+    }
+    </script>
+</body>
+</html>
