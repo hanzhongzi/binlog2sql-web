@@ -59,7 +59,8 @@ python3 manage.py runserver
 清除结果：可以使用“Clear Output”按钮清除解析结果。
 
 ## 图片示例
-![image](https://github.com/user-attachments/assets/ca5843ed-4865-42b5-b8f1-04a06da13769)
+![image](https://github.com/user-attachments/assets/8ae14afc-80f4-4abe-9ef3-390825cd3507)
+
 
 
 ## 示例
