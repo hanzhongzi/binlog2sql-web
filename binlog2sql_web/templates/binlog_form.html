@@ -14,7 +14,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow-y: auto; /* 确保页面可以垂直滚动 */
+            overflow-y: auto;
         }
         .container {
             background-color: #ffffff;
@@ -22,8 +22,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 400px;
-            max-height: 90vh;  /* 确保容器不超过视口高度的90% */
-            overflow-y: auto;  /* 容器内部也可以滚动 */
+            max-height: 90vh;
+            overflow-y: auto;
         }
         h2 {
             color: #333;
@@ -66,13 +66,13 @@
         .output {
             margin-top: 20px;
             font-family: monospace;
-            white-space: pre-wrap;
             color: #444;
             background: #f7f7f7;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             min-height: 50px;
+            width: 100%;
         }
         .loading {
             color: #999;
@@ -131,59 +131,71 @@
         </form>
 
         <!-- 输出区 -->
-        <table class="output" id="output"></table>
+        <div class="output" id="output"></div>
         <p id="loadingText" class="loading" style="display: none;">加载中...</p>
     </div>
 
     <script>
-    async function submitForm() {
-        const runButton = document.getElementById('runButton');
-        const loadingText = document.getElementById('loadingText');
-        const output = document.getElementById('output');
-
-        // 禁用按钮并显示“加载中...”文本
-        runButton.disabled = true;
-        loadingText.style.display = 'block';
-        output.textContent = '';  // 清空输出区
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 设置超时时间 1分钟
-
-        const formData = new FormData(document.getElementById('binlogForm'));
-        const data = {};
-        formData.forEach((value, key) => data[key] = value);
-
-        try {
-            const response = await fetch('/run-binlog2sql/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                signal: controller.signal
-            });
-            
-            const result = await response.json();
-
-            // 取消超时计时器
-            clearTimeout(timeoutId);
-
-            // 恢复按钮状态，隐藏“加载中...”文本，显示返回结果
-            runButton.disabled = false;
-            loadingText.style.display = 'none';
-            output.textContent = result.status === "success" ? result.output : result.error;
-
-        } catch (error) {
-            // 请求出错时处理
-            clearTimeout(timeoutId);
-            runButton.disabled = false;
-            loadingText.style.display = 'none';
-            output.textContent = "An error occurred: " + (error.name === 'AbortError' ? 'Request timed out' : error.message);
+        // 设置当前时间为东八区的默认值
+        function setDefaultTimezone() {
+            const offsetInMs = 8 * 60 * 60 * 1000;
+            const localDate = new Date(Date.now() + offsetInMs);
+            const formattedDate = localDate.toISOString().slice(0, 19).replace("T", " ");
+            document.getElementById("start_datetime").value = formattedDate;
+            document.getElementById("stop_datetime").value = formattedDate;
         }
-    }
+        
+        window.onload = setDefaultTimezone;
 
-    // 清空输出
-    function clearOutput() {
-        document.getElementById('output').textContent = '';
-    }
+        async function submitForm() {
+            const runButton = document.getElementById('runButton');
+            const loadingText = document.getElementById('loadingText');
+            const output = document.getElementById('output');
+
+            runButton.disabled = true;
+            loadingText.style.display = 'block';
+            output.innerHTML = '';
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); 
+
+            const formData = new FormData(document.getElementById('binlogForm'));
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
+            try {
+                const response = await fetch('/run-binlog2sql/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    signal: controller.signal
+                });
+
+                const result = await response.json();
+                clearTimeout(timeoutId);
+
+                runButton.disabled = false;
+                loadingText.style.display = 'none';
+
+                if (result.status === "success") {
+                    output.innerHTML = result.output
+                        .map(line => `<tr><td>${line}</td></tr>`)
+                        .join('');
+                } else {
+                    output.innerHTML = `<tr><td>${result.error}</td></tr>`;
+                }
+
+            } catch (error) {
+                clearTimeout(timeoutId);
+                runButton.disabled = false;
+                loadingText.style.display = 'none';
+                output.innerHTML = `<tr><td>Error: ${error.name === 'AbortError' ? 'Request timed out' : error.message}</td></tr>`;
+            }
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
     </script>
 </body>
 </html>

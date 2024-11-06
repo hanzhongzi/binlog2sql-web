@@ -8,7 +8,8 @@ from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.event import QueryEvent, RotateEvent, FormatDescriptionEvent
 from binlog2sql_web.source_code.binlog2sql_util import  concat_sql_from_binlog_event, create_unique_file, temp_open, \
     reversed_lines, is_dml_event, event_type
-
+from datetime import  timezone, timedelta
+tz_east_8 = timezone(timedelta(hours=8))
 #binlog2sql_web.source_code.
 class Binlog2sql(object):
 
@@ -35,7 +36,6 @@ class Binlog2sql(object):
             self.stop_time = datetime.datetime.strptime(stop_time, "%Y-%m-%d %H:%M:%S")
         else:
             self.stop_time = datetime.datetime.strptime('2999-12-31 00:00:00', "%Y-%m-%d %H:%M:%S")
-
         self.only_schemas = only_schemas if only_schemas else None
         self.only_tables = only_tables if only_tables else None
         self.no_pk, self.flashback, self.stop_never, self.back_interval = (no_pk, flashback, stop_never, back_interval)
@@ -45,6 +45,7 @@ class Binlog2sql(object):
         self.binlogList = []
         self.connection = pymysql.connect(**self.conn_setting)
         with self.connection as cursor:
+
             cursor.execute("SHOW MASTER STATUS")
             self.eof_file, self.eof_pos = cursor.fetchone()[:2]
             cursor.execute("SHOW MASTER LOGS")

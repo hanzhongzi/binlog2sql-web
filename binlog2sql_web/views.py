@@ -46,6 +46,7 @@ def run_binlog2sql(request):
             # 处理日期时间格式
             start_time = args['start_datetime']
             stop_time = args['stop_datetime']
+
             flashback_html =False
             if args['flashback'] == 'true':
                 flashback_html = True
