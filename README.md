@@ -58,6 +58,9 @@ python3 manage.py runserver
 提交解析：点击“Run Binlog2SQL”按钮以启动解析任务，解析结果将显示在页面上。
 清除结果：可以使用“Clear Output”按钮清除解析结果。
 
+## 图片示例
+![image](https://github.com/user-attachments/assets/ca5843ed-4865-42b5-b8f1-04a06da13769)
+
 
 ## 示例
 表单填写示例
