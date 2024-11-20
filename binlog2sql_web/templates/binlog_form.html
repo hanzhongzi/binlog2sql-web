@@ -9,19 +9,33 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
-            overflow-y: auto;
+            padding: 20px;
+            min-height: 100vh;
         }
         .container {
+            display: flex;
+            gap: 20px;
+            max-width: 100%;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+        }
+        .form-section {
+            flex: 1;
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .output-section {
+            flex: 3;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -82,68 +96,72 @@
 </head>
 <body>
     <div class="container">
-        <h2>指定时间的binlog提取或闪回</h2>
-        <form id="binlogForm">
-            <!-- 表单字段 -->
-            <div class="form-group">
-                <label for="host">Host</label>
-                <input type="text" id="host" name="host" required>
-            </div>
-            <div class="form-group">
-                <label for="port">Port</label>
-                <input type="number" id="port" name="port" required>
-            </div>
-            <div class="form-group">
-                <label for="user">User</label>
-                <input type="text" id="user" name="user" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="text" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="database">Database</label>
-                <input type="text" id="database" name="database" required>
-            </div>
-            <div class="form-group">
-                <label for="table">Table</label>
-                <input type="text" id="table" name="table" required>
-            </div>
-            <div class="form-group">
-                <label for="start_file">Start File</label>
-                <input type="text" id="start_file" name="start_file" required>
-            </div>
-            <div class="form-group">
-                <label for="start_datetime">Start Datetime</label>
-                <input type="text" id="start_datetime" name="start_datetime" placeholder="YYYY-MM-DD HH:MM:SS" required>
-            </div>
-            <div class="form-group">
-                <label for="stop_datetime">Stop Datetime</label>
-                <input type="text" id="stop_datetime" name="stop_datetime" placeholder="YYYY-MM-DD HH:MM:SS" required>
-            </div>
-            <div class="form-group">
-                <label>是否要闪回语句?</label>
-                <label><input type="radio" name="flashback" value="true"> Yes</label>
-                <label><input type="radio" name="flashback" value="false" checked> No</label>
-            </div>
-            <button type="button" id="runButton" onclick="submitForm()">Run Binlog2SQL</button>
-            <button type="button" onclick="clearOutput()">Clear Output</button>
-        </form>
-
-        <!-- 输出区 -->
-        <div class="output" id="output"></div>
-        <p id="loadingText" class="loading" style="display: none;">加载中...</p>
+        <div class="form-section">
+            <h2>指定时间的binlog提取或闪回</h2>
+            <form id="binlogForm">
+                <!-- 表单字段 -->
+                <div class="form-group">
+                    <label for="host">Host</label>
+                    <input type="text" id="host" name="host" required>
+                </div>
+                <div class="form-group">
+                    <label for="port">Port</label>
+                    <input type="number" id="port" name="port" required>
+                </div>
+                <div class="form-group">
+                    <label for="user">User</label>
+                    <input type="text" id="user" name="user" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="database">Database</label>
+                    <input type="text" id="databases" name="databases" required>
+                </div>
+                <div class="form-group">
+                    <label for="table">Table</label>
+                    <input type="text" id="tables" name="tables" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_file">Start File</label>
+                    <input type="text" id="start_file" name="start_file" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_time">Start time</label>
+                    <input type="text" id="start_time" name="start_time" placeholder="YYYY-MM-DD HH:MM:SS" required>
+                </div>
+                <div class="form-group">
+                    <label for="stop_time">Stop time</label>
+                    <input type="text" id="stop_time" name="stop_time" placeholder="YYYY-MM-DD HH:MM:SS" required>
+                </div>
+                <div class="form-group">
+                    <label>是否要闪回语句?</label>
+                    <label><input type="radio" name="flashback" value="True"> Yes</label>
+                    <label><input type="radio" name="flashback" value="False" checked> No</label>
+                </div>
+                <button type="button" id="runButton" onclick="submitForm()">Run Binlog2SQL</button>
+                <button type="button" onclick="clearOutput()">Clear Output</button>
+            </form>
+        </div>
+        
+        <div class="output-section">
+            <p  class="loading" style="display: none;">binlog分析结果</p>
+            <div class="output" id="output"></div>
+            <p id="loadingText" class="loading" style="display: none;">加载中...</p>
+        </div>
     </div>
 
     <script>
         // 设置当前时间为东八区的默认值
-        function setDefaultTimezone() {
-            const offsetInMs = 8 * 60 * 60 * 1000;
-            const localDate = new Date(Date.now() + offsetInMs);
-            const formattedDate = localDate.toISOString().slice(0, 19).replace("T", " ");
-            document.getElementById("start_datetime").value = formattedDate;
-            document.getElementById("stop_datetime").value = formattedDate;
-        }
+        //function setDefaultTimezone() {
+        //    const offsetInMs = 8 * 60 * 60 * 1000;
+        //    const localDate = new Date(Date.now() + offsetInMs);
+        //    const formattedDate = localDate.toISOString().slice(0, 19).replace("T", " ");
+        //    document.getElementById("start_datetime").value = formattedDate;
+        //    document.getElementById("stop_datetime").value = formattedDate;
+        //}
         
         window.onload = setDefaultTimezone;
 

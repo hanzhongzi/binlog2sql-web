@@ -124,6 +124,7 @@ class Binlog2sql(object):
             stream.close()
             f_tmp.close()
             if self.flashback:
+                print(self.flashback)
                 output_lines=self.print_rollback_sql(filename=tmp_file)
 
         
@@ -132,6 +133,7 @@ class Binlog2sql(object):
     def print_rollback_sql(self, filename):
         output_lines = []
         """print rollback sql from tmp_file"""
+        
         with open(filename, "rb") as f_tmp:
             batch_size = 1000
             i = 0
