@@ -197,7 +197,7 @@
 
                 if (result.status === "success") {
                     output.innerHTML = result.output
-                        .map(line => `<tr><td>${line}</td></tr>`)
+                        .map(line => `<tr><td><div>${line}</div></td></tr>`)
                         .join('');
                 } else {
                     output.innerHTML = `<tr><td>${result.error}</td></tr>`;
