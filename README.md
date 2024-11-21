@@ -59,7 +59,7 @@ python3 manage.py runserver
 清除结果：可以使用“Clear Output”按钮清除解析结果。
 
 ## 图片示例
-![image](https://github.com/user-attachments/assets/8ae14afc-80f4-4abe-9ef3-390825cd3507)
+![image](./binlog2sql_web/source_file/binlog2sql-web.jpeg)
 
 
 
